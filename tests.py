@@ -35,7 +35,7 @@ class TestBooksCollector:
     def test_add_new_book_boundary_value_negative(self, name_book):
         collector = BooksCollector()
         collector.add_new_book(name_book)
-        assert name_book in collector.get_books_genre()
+        assert name_book not in collector.get_books_genre()
 
     def test_set_book_genre_positive(self):
         collector = BooksCollector()
@@ -51,7 +51,7 @@ class TestBooksCollector:
         genre = 'Драма'
         collector.add_new_book(name_book)
         collector.set_book_genre(name_book, genre)
-        assert collector.get_book_genre(name_book) == genre
+        assert collector.get_book_genre(name_book) == ''
 
     def test_get_books_genre_true_value_positive(self):
         collector = BooksCollector()
@@ -72,42 +72,27 @@ class TestBooksCollector:
         assert isinstance(collector.get_books_genre(), dict)
         assert bool(collector.get_books_genre())
 
-    def test_get_books_with_specific_genre(self):
+    @pytest.mark.parametrize('name_books,genre', [('Бойцовский клуб', 'Ужасы'),
+                                                  ('Первый мститель', 'Детективы'),
+                                                  ('В', 'Мультфильмы'),
+                                                  ('Поворот не туда', 'Комедии')]
+                            )
+    def test_get_books_with_specific_genre_positive(self, name_books, genre):
         collector = BooksCollector()
-        books_list_sorting_for_genre = []
-        name_books = ['Бойцовский клуб', 'Первый мститель', 'В', 'Поворот не туда', 'Тайная жизнь домашних живаотных']
+        collector.add_new_book(name_books)
+        collector.set_book_genre(name_books, genre)
+        assert name_books in collector.get_books_with_specific_genre(genre)
 
-        for i in name_books:
-            collector.add_new_book(i)
-            collector.set_book_genre(i, random.choice(collector.genre))
-
-        get_random_genre_in_dict = collector.get_book_genre(random.choice(name_books))
-
-        for key, i in collector.get_books_genre().items():
-            if i == get_random_genre_in_dict:
-                books_list_sorting_for_genre.append(key)
-
-        sorting_list_books_name = collector.get_books_with_specific_genre(get_random_genre_in_dict)
-
-        assert sorting_list_books_name == books_list_sorting_for_genre
-
-    def test_get_books_for_children(self):
+    @pytest.mark.parametrize('name_books,genre', [('В', 'Мультфильмы'),
+                                                  ('Поворот не туда', 'Комедии')]
+                             )
+    def test_get_books_for_children_pisitive(self, name_books, genre):
         collector = BooksCollector()
-        books_list_sorting_for_genre = []
-        name_books = ['Бойцовский клуб', 'Первый мститель', 'В', 'Поворот не туда', 'Тайная жизнь домашних живаотных']
-
-        for i in name_books:
-            collector.add_new_book(i)
-            collector.set_book_genre(i, random.choice(collector.genre))
+        collector.add_new_book(name_books)
+        collector.set_book_genre(name_books, genre)
+        assert name_books in collector.get_books_for_children()
 
 
-        for key, i in collector.get_books_genre().items():
-            if i not in collector.genre_age_rating:
-                books_list_sorting_for_genre.append(key)
-
-        sorting_list_books_name = collector.get_books_for_children()
-
-        assert sorting_list_books_name == books_list_sorting_for_genre
 
     def test_add_book_in_favorites_positive(self):
         collector = BooksCollector()
